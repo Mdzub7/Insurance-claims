@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Profile</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="patient-shell">
+    <aside class="sidebar">
+      <div class="sidebar-top"><button class="sidebar-toggle" aria-label="Toggle sidebar">☰</button></div>
+      <div class="sidebar-header">
+        <img class="sidebar-avatar" src="../assets/img/profile.png" alt="Avatar">
+        <div>
+          <div class="sidebar-name" id="sbName">Admin</div>
+          <div class="sidebar-id" id="sbId">ID</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" href="../index.html"><img class="sidebar-icon" src="../assets/icons/home.svg"><span>Home</span></a>
+        <a class="sidebar-link active" href="profile.html"><img class="sidebar-icon" src="../assets/icons/patient.svg"><span>Profile</span></a>
+        <a class="sidebar-link" href="dashboard.html"><img class="sidebar-icon" src="../assets/icons/dashboard.svg"><span>Dashboard</span></a>
+        <a class="sidebar-link" href="claims.html"><img class="sidebar-icon" src="../assets/icons/history.svg"><span>Claims</span></a>
+        <a class="sidebar-link" href="analytics.html"><img class="sidebar-icon" src="../assets/icons/lifecycle.svg"><span>Analytics</span></a>
+      </nav>
+      <img class="sidebar-bottom-logo" src="../assets/img/cigna.png" alt="Cigna">
+    </aside>
+    <main class="content">
+      <div class="card">
+        <img class="page-brand" src="../assets/img/cigna1.png" alt="brand">
+        <h1>Profile</h1>
+        <div id="adminProfile">Loading...</div>
+      </div>
+    </main>
+  </div>
+  <script src="admin.js"></script>
+  <script src="../patient/sidebar.js"></script>
+</body>
+</html>

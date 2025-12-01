@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Analytics</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="patient-shell">
+    <aside class="sidebar">
+      <div class="sidebar-top"><button class="sidebar-toggle" aria-label="Toggle sidebar">☰</button></div>
+      <div class="sidebar-header">
+        <img class="sidebar-avatar" src="../assets/img/profile.png" alt="Avatar">
+        <div>
+          <div class="sidebar-name" id="sbName">Admin</div>
+          <div class="sidebar-id" id="sbId">ID</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" href="../index.html"><img class="sidebar-icon" src="../assets/icons/home.svg"><span>Home</span></a>
+        <a class="sidebar-link" href="profile.html"><img class="sidebar-icon" src="../assets/icons/patient.svg"><span>Profile</span></a>
+        <a class="sidebar-link" href="dashboard.html"><img class="sidebar-icon" src="../assets/icons/dashboard.svg"><span>Dashboard</span></a>
+        <a class="sidebar-link" href="claims.html"><img class="sidebar-icon" src="../assets/icons/history.svg"><span>Claims</span></a>
+        <a class="sidebar-link active" href="analytics.html"><img class="sidebar-icon" src="../assets/icons/lifecycle.svg"><span>Analytics</span></a>
+      </nav>
+      <img class="sidebar-bottom-logo" src="../assets/img/cigna.png" alt="Cigna">
+    </aside>
+    <main class="content">
+      <div class="card">
+        <img class="page-brand" src="../assets/img/cigna1.png" alt="brand">
+        <h1>Claims Analytics</h1>
+        <div class="filters">
+          <label>Year</label>
+          <select id="yearSelect"></select>
+          <label>User</label>
+          <select id="userSelect"><option value="all">All Users</option></select>
+        </div>
+        <div class="charts-grid">
+          <div class="card"><h2>Monthly Amounts</h2><canvas id="chartMonthlyAll"></canvas></div>
+          <div class="card"><h2>Status Distribution</h2><canvas id="chartStatusAll"></canvas></div>
+        </div>
+        <div class="card"><h2>Top Users by Amount</h2><canvas id="chartTopUsers"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>User Search</h2>
+        <div class="filters">
+          <input id="userSearchBox" type="text" placeholder="Search user by email or name" />
+          <button id="userSearchBtn" class="auth-submit" style="width:auto;">Search</button>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Patient ID</th></tr></thead>
+            <tbody id="searchResults"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="admin.js"></script>
+  <script src="../patient/sidebar.js"></script>
+  <script>
+    (async function(){
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const API_BASE = 'http://localhost:8001/api/v1';
+      const usersRes = await fetch(`${API_BASE}/admin/users`, { headers });
+      const users = usersRes.ok ? await usersRes.json() : [];
+      const userSelect = document.getElementById('userSelect');
+      const yearSelect = document.getElementById('yearSelect');
+      users.forEach(u=>{ const opt=document.createElement('option'); opt.value=u.user_id; opt.textContent=u.name||u.email||u.user_id; userSelect.appendChild(opt); });
+      const claimsRes = await fetch(`${API_BASE}/admin/claims`, { headers });
+      let allClaims = claimsRes.ok ? await claimsRes.json() : [];
+      if (!allClaims.length) { const now=new Date(); allClaims=[{created_at:now.toISOString(), amount:1200, claim_status:'PENDING', user_id:'demo'}]; }
+      const years=Array.from(new Set(allClaims.map(c=> new Date(c.created_at).getFullYear()))).sort(); const currentYear=new Date().getFullYear(); yearSelect.innerHTML=years.map(y=>`<option ${y===currentYear?'selected':''}>${y}</option>`).join('');
+      function render(){
+        const year=parseInt(yearSelect.value||currentYear); const uid=userSelect.value;
+        const claims=allClaims.filter(c=> { const d=new Date(c.created_at); return !isNaN(d) && d.getFullYear()===year && (uid==='all' || c.user_id===uid); });
+        const byMonth=Array(12).fill(0), amtByMonth=Array(12).fill(0);
+        let p=0,a=0,rj=0; const totalsByUser={};
+        claims.forEach(c=>{ const d=new Date(c.created_at); const m=d.getMonth(); byMonth[m]++; amtByMonth[m]+=Number(c.amount||0); const st=(c.claim_status||''); if(st==='PENDING')p++; else if(st==='APPROVED')a++; else if(st==='REJECTED')rj++; totalsByUser[c.user_id]=(totalsByUser[c.user_id]||0)+Number(c.amount||0); });
+        const mctx=document.getElementById('chartMonthlyAll'); if (mctx) new Chart(mctx,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{label:'Claims',data:byMonth,backgroundColor:'#0926fe',borderRadius:6},{label:'Amount (₹)',data:amtByMonth,type:'line',borderColor:'#27ae60',yAxisID:'y1'}]},options:{responsive:true,scales:{y:{beginAtZero:true},y1:{beginAtZero:true,position:'right'}}}});
+        const sctx=document.getElementById('chartStatusAll'); if (sctx) new Chart(sctx,{type:'doughnut',data:{labels:['Pending','Approved','Rejected'],datasets:[{data:[p,a,rj],backgroundColor:['#f1c40f','#27ae60','#e74c3c']}]} });
+        const filteredUsers = uid==='all' ? users.filter(u=> claims.some(c=> c.user_id===u.user_id)) : users.filter(u=> u.user_id===uid);
+        const topPairs=Object.entries(totalsByUser).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([uid,amt])=>{ const u=users.find(x=>x.user_id===uid); const label=(u && (u.name||u.email))||uid; return [label, amt]; });
+        const tctx=document.getElementById('chartTopUsers'); if (tctx) new Chart(tctx,{type:'bar',data:{labels:topPairs.map(p=>p[0]),datasets:[{label:'Total Amount (₹)',data:topPairs.map(p=>p[1]),backgroundColor:'#00a6a6',borderRadius:6}]},options:{responsive:true,indexAxis:'y'} });
+        // Apply filters to the User Search table
+        const tbody=document.getElementById('searchResults');
+        if (tbody) tbody.innerHTML=filteredUsers.map(u=>`<tr><td>${u.name||''}</td><td>${u.email||''}</td><td>${u.role||''}</td><td>${u.patient_id||''}</td></tr>`).join('');
+      }
+      render();
+      yearSelect.addEventListener('change', render); userSelect.addEventListener('change', render);
+      // user search table render
+      function renderUsers(q){
+        const s=(q||'').toLowerCase();
+        const year=parseInt(yearSelect.value||currentYear); const uid=userSelect.value;
+        const claimsInYear=allClaims.filter(c=> new Date(c.created_at).getFullYear()===year);
+        const allowedUserIds = uid==='all' ? new Set(claimsInYear.map(c=> c.user_id)) : new Set([uid]);
+        const items=users.filter(u=> ((u.email||'').toLowerCase().includes(s) || (u.name||'').toLowerCase().includes(s)) && allowedUserIds.has(u.user_id));
+        const tbody=document.getElementById('searchResults');
+        if (tbody) tbody.innerHTML=items.map(u=>`<tr><td>${u.name||''}</td><td>${u.email||''}</td><td>${u.role||''}</td><td>${u.patient_id||''}</td></tr>`).join('');
+      }
+      renderUsers('');
+      document.getElementById('userSearchBtn').addEventListener('click',()=> renderUsers(document.getElementById('userSearchBox').value));
+      document.getElementById('userSearchBox').addEventListener('input',(e)=> renderUsers(e.target.value));
+    })();
+  </script>
+</body>
+</html>

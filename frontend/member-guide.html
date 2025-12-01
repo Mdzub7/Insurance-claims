@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><img class="brand-logo" src="assets/img/cigna.png" alt="Cigna"></a>
+      <nav class="site-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="patient/submit.html" class="nav-link">Submit Claim</a>
+        <a href="patient/claims.html" class="nav-link">Claims History</a>
+        <a href="member-guide.html" class="nav-link">Member Guide</a>
+      </nav>
+      <div class="header-actions">
+        <a class="cta-register" href="register.html">Register</a>
+        <a class="cta-login" href="login.html">Log in</a>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <div class="card">
+      <img class="page-brand" src="assets/img/cigna1.png" alt="brand">
+      <h1>Member Guide</h1>
+      <p>Welcome to the Claims Portal. This guide walks you through common tasks and provides demo access to explore the UI quickly.</p>
+    </div>
+    <div class="card">
+      <h2>Quick Start</h2>
+      <ol>
+        <li>Use demo access to preview the portal flow.</li>
+        <li>Submit a claim and review claim lifecycle.</li>
+        <li>Check the analytics in your dashboard.</li>
+      </ol>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <button type="button" class="auth-submit" id="demoPatientBtn" style="width:auto; padding:8px 12px;">Login as Demo Patient</button>
+        <button type="button" class="auth-submit" id="demoAdminBtn" style="width:auto; padding:8px 12px;">Login as Demo Admin</button>
+      </div>
+      <small style="display:block; color:#6b7d8a; margin-top:8px;">Demo accounts are for UI preview only.</small>
+    </div>
+    <div class="card">
+      <h2>Portal Overview</h2>
+      <ul>
+        <li><strong>Dashboard:</strong> Overview of your claims with charts and KPIs.</li>
+        <li><strong>Claim Lifecycle:</strong> Visual status tracker from submission to decision.</li>
+        <li><strong>Claims History:</strong> Filterable table with statuses and amounts.</li>
+        <li><strong>Submit Claim:</strong> Simple form with a preview-only document selector while uploads are disabled.</li>
+      </ul>
+    </div>
+  </main>
+  <script src="js/auth.js"></script>
+  <script>
+    function authed(){ return !!(sessionStorage.getItem('token') || localStorage.getItem('token')); }
+    document.getElementById('demoPatientBtn').addEventListener('click', ()=>{
+      setAuth('DEMO', 'patient', 'PATIENT#DEMO', true);
+      window.location.href = 'patient/dashboard.html';
+    });
+    document.getElementById('demoAdminBtn').addEventListener('click', ()=>{
+      setAuth('DEMO', 'admin', null, true);
+      window.location.href = 'admin/dashboard.html';
+    });
+  </script>
+</body>
+</html>

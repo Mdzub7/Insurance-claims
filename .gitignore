@@ -1,0 +1,223 @@
+
+# ------------------------------------------------------------------------------
+# Global safety: secrets, credentials, keys, and local-only files
+# ------------------------------------------------------------------------------
+# Common secret patterns
+*.env
+*.env.*
+.env
+.env.*
+*.secret
+*.secrets
+*.credentials
+*.config.local
+*.local
+*.private
+*.vault
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+*.csr
+*.crt
+*.cer
+
+# Token & auth files
+*.token
+*.session
+*.auth
+*.otp
+
+# Example env files SHOULD be committed as templates (keep these tracked)
+# .env.example
+# .env.template
+
+# ------------------------------------------------------------------------------
+# Terraform
+# ------------------------------------------------------------------------------
+# State, caches, plans, crashes
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+
+.trae/
+
+LICENSE.txt
+
+terraform
+
+# Local overrides (should not be committed)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Plans (binary or JSON)
+*.tfplan
+*.plan
+
+# Local CLI config (user-specific)
+.terraformrc
+terraform.rc
+
+# NOTE: Keep the lockfile tracked for provider integrity
+# !.terraform.lock.hcl
+
+# ------------------------------------------------------------------------------
+# Terragrunt (if you use it)
+# ------------------------------------------------------------------------------
+.terragrunt-cache/
+# Debug vars often contain secrets
+terragrunt-debug.tfvars.json
+
+# ------------------------------------------------------------------------------
+# Kubernetes / Cloud (only ignore if these are local/dev and contain secrets)
+# ------------------------------------------------------------------------------
+# kubeconfigs often contain tokens—avoid committing
+kubeconfig
+.kube/
+# Cloud CLI caches
+.aws/
+.azure/
+.gcloud/
+# If you must keep templates, add non-secret versions like: kubeconfig.template
+
+# ------------------------------------------------------------------------------
+# Editor/OS noise
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Vim/Emacs
+*~
+*.swp
+*.swo
+*.swx
+.#*
+# VS Code
+.vscode/
+# JetBrains
+.idea/
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# ------------------------------------------------------------------------------
+# Logs & runtime cache
+# ------------------------------------------------------------------------------
+*.log
+logs/
+log/
+tmp/
+temp/
+.cache/
+.cache-loader/
+.coverage
+coverage/
+.nyc_output/
+
+# ------------------------------------------------------------------------------
+# Node.js (uncomment if you use Node)
+# ------------------------------------------------------------------------------
+# node_modules/
+# dist/
+# build/
+# .next/
+# .nuxt/
+# .vite/
+# vite.config.local.*
+
+# ------------------------------------------------------------------------------
+# Python (uncomment if you use Python)
+# ------------------------------------------------------------------------------
+# __pycache__/
+# *.pyc
+# *.pyo
+# *.pyd
+# .pytest_cache/
+# .venv/
+# venv/
+# pip-log.txt
+# .python-version
+
+# ------------------------------------------------------------------------------
+# Java / JVM (uncomment if you use Java/Scala/Kotlin)
+# ------------------------------------------------------------------------------
+# target/
+# *.class
+# .gradle/
+# build/
+# .mvn/
+# *.iml
+
+# ------------------------------------------------------------------------------
+# Go (uncomment if you use Go)
+# ------------------------------------------------------------------------------
+# bin/
+# vendor/
+# *.test
+# *.out
+
+# ------------------------------------------------------------------------------
+# .NET (uncomment if you use .NET)
+# ------------------------------------------------------------------------------
+# bin/
+# obj/
+# *.user
+# *.suo
+
+# ------------------------------------------------------------------------------
+# Docker
+# ------------------------------------------------------------------------------
+# Local env files used in compose
+docker-compose.override.yml
+.docker/
+.env.docker
+.env.local
+
+# ------------------------------------------------------------------------------
+# Misc artifacts
+# ------------------------------------------------------------------------------
+# Archives
+*.zip
+*.tar
+*.gz
+*.tgz
+*.rar
+
+# Binary outputs
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+
+# Database dumps
+*.sql
+*.sqlite
+*.db
+
+# IDE-specific local settings (safe defaults)
+*.code-workspace
+
+.mypy_cache/
+node_modules/
+tests/
+test-results/
+
+package-lock.json
+package.json
+playwright.config.ts

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Claim</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="patient-shell">
+    <aside class="sidebar">
+      <div class="sidebar-top"><button class="sidebar-toggle" aria-label="Toggle sidebar">☰</button></div>
+      <div class="sidebar-header">
+        <img class="sidebar-avatar" src="../assets/img/profile.png" alt="Avatar">
+        <div>
+          <div class="sidebar-name" id="sbName">Member</div>
+          <div class="sidebar-id" id="sbId">ID</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" href="../index.html"><img class="sidebar-icon" src="../assets/icons/home.svg"><span>Home</span></a>
+        <a class="sidebar-link" href="profile.html"><img class="sidebar-icon" src="../assets/icons/patient.svg"><span>Profile</span></a>
+        <a class="sidebar-link" href="dashboard.html"><img class="sidebar-icon" src="../assets/icons/dashboard.svg"><span>Dashboard</span></a>
+        <a class="sidebar-link active" href="submit.html"><img class="sidebar-icon" src="../assets/icons/submit.svg"><span>Submit Claim</span></a>
+        <a class="sidebar-link" href="claims.html"><img class="sidebar-icon" src="../assets/icons/history.svg"><span>Claim History</span></a>
+        <a class="sidebar-link" href="lifecycle.html"><img class="sidebar-icon" src="../assets/icons/lifecycle.svg"><span>Claim Lifecycle</span></a>
+      </nav>
+      <img class="sidebar-bottom-logo" src="../assets/img/cigna.png" alt="Cigna">
+    </aside>
+    <main class="content">
+      <div class="card">
+        <img class="page-brand" src="../assets/img/cigna1.png" alt="brand">
+        <h1>Submit Claim</h1>
+      <form id="submitForm" novalidate>
+        <div class="form-group">
+          <label for="policyNumber">Policy Number</label>
+          <input id="policyNumber" type="text" required />
+        </div>
+        <div class="form-group">
+          <label for="amount">Claim Amount (₹)</label>
+          <input id="amount" type="number" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="file">Medical Report (PDF)</label>
+          <div id="dropzone" class="dropzone">
+            <div class="dz-title">Upload PDF</div>
+            <div class="dz-note">Drag & drop or click to select</div>
+            <div id="dzFilename" style="margin-top:8px;"></div>
+          </div>
+          <input id="file" type="file" accept="application/pdf" style="display:none;" />
+        </div>
+        <button class="auth-submit" type="submit">Submit</button>
+        <div id="uploadMsg" class="auth-message"></div>
+      </form>
+    </main>
+  </div>
+  <script src="patient.js"></script>
+  <script src="sidebar.js"></script>
+  <script>
+    const dz = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file');
+    const nameEl = document.getElementById('dzFilename');
+    if (dz && fileInput) {
+      dz.addEventListener('click', ()=> fileInput.click());
+      dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.style.background='#eef3ff'; });
+      dz.addEventListener('dragleave', ()=>{ dz.style.background='#fff'; });
+      dz.addEventListener('drop', e=>{ e.preventDefault(); if (e.dataTransfer.files.length){ fileInput.files = e.dataTransfer.files; nameEl.textContent = e.dataTransfer.files[0].name; dz.style.background='#fff'; }});
+      fileInput.addEventListener('change', ()=>{ if (fileInput.files.length) nameEl.textContent = fileInput.files[0].name; });
+    }
+  </script>
+</body>
+</html>

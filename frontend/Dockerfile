@@ -1,0 +1,7 @@
+FROM nginx:1.25-alpine
+WORKDIR /usr/share/nginx/html
+COPY frontend /usr/share/nginx/html
+COPY deploy/docker/frontend-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENV BACKEND_BASE=
+CMD ["/entrypoint.sh"]

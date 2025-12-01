@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Portal</h1>
+      <div id="content">
+        <p>Select a page:</p>
+        <div id="patientNav" style="display:none;">
+          <a class="cta-button" href="patient/profile.html">Profile</a>
+          <a class="cta-button" href="patient/claims.html" style="margin-left:12px;">Claims History</a>
+          <a class="cta-button" href="patient/submit.html" style="margin-left:12px;">Submit Claim</a>
+        </div>
+        <div id="adminNav" style="display:none;">
+          <a class="cta-button" href="admin/dashboard.html">Admin Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('role') || (sessionStorage.getItem('role') || localStorage.getItem('role'));
+    if (role === 'patient') document.getElementById('patientNav').style.display = 'block';
+    if (role === 'admin') document.getElementById('adminNav').style.display = 'block';
+  </script>
+</body>
+</html>

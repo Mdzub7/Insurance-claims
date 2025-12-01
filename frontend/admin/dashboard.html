@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="patient-shell">
+    <aside class="sidebar">
+      <div class="sidebar-top"><button class="sidebar-toggle" aria-label="Toggle sidebar">☰</button></div>
+      <div class="sidebar-header">
+        <img class="sidebar-avatar" src="../assets/img/profile.png" alt="Avatar">
+        <div>
+          <div class="sidebar-name" id="sbName">Admin</div>
+          <div class="sidebar-id" id="sbId">ID</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" href="../index.html"><img class="sidebar-icon" src="../assets/icons/home.svg"><span>Home</span></a>
+        <a class="sidebar-link" href="profile.html"><img class="sidebar-icon" src="../assets/icons/patient.svg"><span>Profile</span></a>
+        <a class="sidebar-link active" href="dashboard.html"><img class="sidebar-icon" src="../assets/icons/dashboard.svg"><span>Dashboard</span></a>
+        <a class="sidebar-link" href="claims.html"><img class="sidebar-icon" src="../assets/icons/history.svg"><span>Claims</span></a>
+        <a class="sidebar-link" href="analytics.html"><img class="sidebar-icon" src="../assets/icons/lifecycle.svg"><span>Analytics</span></a>
+      </nav>
+      <img class="sidebar-bottom-logo" src="../assets/img/cigna.png" alt="Cigna">
+    </aside>
+    <main class="content">
+      <div class="card">
+        <img class="page-brand" src="../assets/img/cigna1.png" alt="brand">
+        <h1>Admin Dashboard</h1>
+        <div class="stats-grid" id="adminStats"></div>
+      </div>
+      <div class="charts-grid">
+        <div class="card">
+          <h2>Monthly Totals</h2>
+          <canvas id="adminMonthly"></canvas>
+        </div>
+        <div class="card">
+          <h2>Status Distribution</h2>
+          <canvas id="adminStatus"></canvas>
+        </div>
+      </div>
+      <div class="table-card card">
+        <h2>Users</h2>
+        <div class="filters">
+          <input id="userSearch" type="text" placeholder="Search by name or email" />
+        </div>
+        <div id="usersDiv">Loading...</div>
+      </div>
+      <div class="table-card card">
+        <h2>Pending Claims</h2>
+        <div class="filters"><input id="claimsSearch" type="text" placeholder="Search claims by ID or description" /></div>
+        <div id="claimsDiv">Loading...</div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="admin.js"></script>
+  <script src="../patient/sidebar.js"></script>
+</body>
+</html>

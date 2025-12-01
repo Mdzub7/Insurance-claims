@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insurance Claims Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <img class="brand-logo" src="assets/img/cigna.png" alt="Cigna brand" style="height:45px;">
+      </a>
+      <nav class="site-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="patient/submit.html" class="nav-link">Submit Claim</a>
+        <a href="patient/claims.html" class="nav-link">Claims History</a>
+        <a href="member-guide.html" class="nav-link">Member Guide</a>
+      </nav>
+      <div class="header-actions">
+        <a class="cta-register" href="register.html">Register</a>
+        <a class="cta-login" href="login.html">Log in</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-section">
+      <div class="hero-media">
+        <img class="hero-bg" src="assets/img/hero-leaves.png" alt="Background pattern">
+        <img class="hero-figure" src="assets/img/hero-patient.jpg" alt="Member image">
+      </div>
+      <div class="hero-content">
+        <p class="hero-greet" id="greet"></p>
+        <h1 class="hero-title">Fast Insurance Claims, Done Right</h1>
+        <p class="hero-sub">For individuals and families. Submit, track, and get decisions quickly.</p>
+        <div class="hero-ctas">
+          <a href="patient/submit.html" class="cta-button">Explore claims</a>
+          <a href="register.html" class="cta-button alt">Activate your account</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="tray" aria-label="Quick actions">
+      <div class="tray-inner">
+        <div class="tray-left">
+          <h2 class="tray-title">Start your claim</h2>
+          <div class="tray-form">
+            <label class="tray-label" for="claimType">Select a type of claim</label>
+            <select id="claimType" class="tray-select">
+              <option>Medical</option>
+              <option>Dental</option>
+              <option>Vision</option>
+            </select>
+          <a class="tray-action" href="patient/submit.html">Go</a>
+          </div>
+        </div>
+        <div class="tray-right">
+          <h3 class="tray-subtitle">Already a member?</h3>
+          <p class="tray-copy">Access all plan details and 24/7 support.</p>
+          <a class="tray-action" href="login.html">Log in to your portal</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="value-grid">
+      <div class="value-item reveal">
+        <img src="assets/icons/hipaa.svg" alt="HIPAA icon" class="value-icon">
+        <h3 class="value-title">HIPAA-conscious</h3>
+        <p class="value-copy">Data handling designed with privacy and security at the forefront.</p>
+      </div>
+      <div class="value-item reveal">
+        <img src="assets/icons/security.svg" alt="Security icon" class="value-icon">
+        <h3 class="value-title">Secure by default</h3>
+        <p class="value-copy">Best-practice authentication and protected endpoints throughout the portal.</p>
+      </div>
+      <div class="value-item reveal">
+        <img src="assets/icons/cloud.svg" alt="Cloud icon" class="value-icon">
+        <h3 class="value-title">Cloud-native</h3>
+        <p class="value-copy">Built on scalable services for consistent performance and reliability.</p>
+      </div>
+      <div class="value-item reveal">
+        <img src="assets/icons/speed.svg" alt="Speed icon" class="value-icon">
+        <h3 class="value-title">Fast decisions</h3>
+        <p class="value-copy">Streamlined workflows from claim submission to resolution.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>For Individuals</h4>
+          <a href="patient/submit.html" class="footer-link">Submit a Claim</a>
+          <a href="patient/claims.html" class="footer-link">View Claim History</a>
+          <a href="register.html" class="footer-link">Create Account</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="dashboard.html" class="footer-link">Member Guide</a>
+          <a href="404.html" class="footer-link">Help Center</a>
+          <a href="404.html" class="footer-link">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="404.html" class="footer-link">Privacy Notice</a>
+          <a href="404.html" class="footer-link">Terms of Use</a>
+          <a href="404.html" class="footer-link">Accessibility</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 Insurance Claims Portal</p>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="login.html">Log in</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const greetEl = document.getElementById('greet');
+    if (greetEl) {
+      const h = new Date().getHours();
+      const g = h < 12 ? 'Good Morning' : h < 18 ? 'Good Afternoon' : 'Good Evening';
+      greetEl.textContent = g;
+    }
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if (e.isIntersecting) e.target.classList.add('revealed'); });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+    function authed(){ return !!(sessionStorage.getItem('token') || localStorage.getItem('token')); }
+    function guard(anchor){
+      if (!anchor) return;
+      anchor.addEventListener('click', (e)=>{
+        if (!authed()) {
+          e.preventDefault();
+          const dest = anchor.getAttribute('href');
+          window.location.href = `login.html?next=${encodeURIComponent(dest)}`;
+        }
+      });
+    }
+    guard(document.querySelector('.nav-link[href="patient/submit.html"]'));
+    guard(document.querySelector('.nav-link[href="patient/claims.html"]'));
+    guard(document.querySelector('.tray-action'));
+    guard(document.querySelector('.cta-button[href="patient/submit.html"]'));
+  </script>
+</body>
+</html>

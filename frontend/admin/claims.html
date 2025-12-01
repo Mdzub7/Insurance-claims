@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Claims</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="patient-shell">
+    <aside class="sidebar">
+      <div class="sidebar-top"><button class="sidebar-toggle" aria-label="Toggle sidebar">☰</button></div>
+      <div class="sidebar-header">
+        <img class="sidebar-avatar" src="../assets/img/profile.png" alt="Avatar">
+        <div>
+          <div class="sidebar-name" id="sbName">Admin</div>
+          <div class="sidebar-id" id="sbId">ID</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" href="../index.html"><img class="sidebar-icon" src="../assets/icons/home.svg"><span>Home</span></a>
+        <a class="sidebar-link" href="profile.html"><img class="sidebar-icon" src="../assets/icons/patient.svg"><span>Profile</span></a>
+        <a class="sidebar-link" href="dashboard.html"><img class="sidebar-icon" src="../assets/icons/dashboard.svg"><span>Dashboard</span></a>
+        <a class="sidebar-link active" href="claims.html"><img class="sidebar-icon" src="../assets/icons/history.svg"><span>Claims</span></a>
+        <a class="sidebar-link" href="analytics.html"><img class="sidebar-icon" src="../assets/icons/lifecycle.svg"><span>Analytics</span></a>
+      </nav>
+      <img class="sidebar-bottom-logo" src="../assets/img/cigna.png" alt="Cigna">
+    </aside>
+    <main class="content">
+      <div class="card">
+        <img class="page-brand" src="../assets/img/cigna1.png" alt="brand">
+        <h1>Pending Claims</h1>
+        <div id="claimsDiv" class="table-card">Loading...</div>
+      </div>
+      <div class="card">
+        <h2>Search by Patient ID</h2>
+        <div class="filters">
+          <input id="searchPatientId" type="text" placeholder="PATIENT#..." />
+          <button class="auth-submit" id="searchBtn" style="width:auto;">Search</button>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead><tr><th>ID</th><th>Date</th><th>Description</th><th>Amount</th><th>Status</th><th>Document</th></tr></thead>
+            <tbody id="searchTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="admin.js"></script>
+  <script src="../patient/sidebar.js"></script>
+  <script>
+    function renderClaimsByPatient(patientId) {
+      (async ()=>{
+        const API_BASE = 'http://localhost:8001/api/v1'
+        const token = sessionStorage.getItem('token') || localStorage.getItem('token')
+        const headers = token ? { Authorization: `Bearer ${token}` } : {}
+        const res = await fetch(`${API_BASE}/admin/claims/by-patient/${encodeURIComponent(patientId)}`, { headers })
+        if (!res.ok) { document.getElementById('searchTable').innerHTML = '<tr><td colspan="6">Failed to load claims</td></tr>'; return }
+        const claims = await res.json()
+        document.getElementById('searchTable').innerHTML = (claims.length?claims.map(c=>`
+          <tr><td>${c.claim_id}</td><td>${new Date(c.created_at).toLocaleDateString()}</td><td>${c.description||''}</td><td>₹${Number(c.amount||0).toFixed(2)}</td><td><span class='badge badge-${c.claim_status}'>${c.claim_status}</span></td><td>${c.s3_upload_url?`<a href='${c.s3_upload_url}' target='_blank'>View</a>`:'-'}</td></tr>
+        `).join(''):`<tr><td colspan="6">No claims found for ${patientId}</td></tr>`)
+      })()
+    }
+    document.getElementById('searchBtn').addEventListener('click', ()=>{
+      const patientId = document.getElementById('searchPatientId').value.trim()
+      if (!patientId) return
+      renderClaimsByPatient(patientId)
+    })
+    document.getElementById('searchPatientId').addEventListener('keydown', (e)=>{
+      if (e.key==='Enter') {
+        const patientId = e.target.value.trim(); if (patientId) renderClaimsByPatient(patientId)
+      }
+    })
+  </script>
+</body>
+</html>
