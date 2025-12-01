@@ -1,7 +1,7 @@
 # Cloud-Native Insurance Claim Filing System
 
 ## Overview
-Modern claims portal with patient and admin experiences. Frontend is static (HTML/CSS/JS) and themed to match Cigna styling; backend is FastAPI with AWS Services integrations DynamoDB, S3, Secrets manager, Lambda, etc.
+Modern claims portal with patient and admin experiences. Frontend is static (HTML/CSS/JS) and themed to match Cigna styling; backend is FastAPI with AWS Services integrations DynamoDB, S3, Secrets manager, Lambda, SQS etc.
 
 ## Quick Start
 - Frontend:
