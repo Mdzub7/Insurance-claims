@@ -49,7 +49,6 @@ crash.*.log
 
 LICENSE.txt
 
-terraform
 
 # Local overrides (should not be committed)
 override.tf
