@@ -1,7 +1,8 @@
 from typing import List, Dict, Optional
 import boto3
 from botocore.exceptions import ClientError
-from app.core.database import get_dynamodb_table
+from app.core.database import get_dynamodb_table, get_s3_client
+from app.core.config import settings
 
 
 class AdminService:
@@ -22,7 +23,7 @@ class AdminService:
         """List claims with status PENDING."""
         table = get_dynamodb_table()
         resp = table.scan(FilterExpression=boto3.dynamodb.conditions.Attr("claim_status").eq("PENDING"))
-        return resp.get("Items", [])
+        return self._attach_document_urls(resp.get("Items", []))
 
     def list_claims(self, status: Optional[str] = None) -> List[Dict]:
         """List claims, optionally filtered by status."""
@@ -32,13 +33,13 @@ class AdminService:
             resp = table.scan(FilterExpression=attr.eq(status))
         else:
             resp = table.scan(FilterExpression=attr.exists())
-        return resp.get("Items", [])
+        return self._attach_document_urls(resp.get("Items", []))
 
     def list_claims_by_patient(self, patient_id: str) -> List[Dict]:
         """List all claims for a given patient_id."""
         table = get_dynamodb_table()
         resp = table.scan(FilterExpression=boto3.dynamodb.conditions.Attr("patient_id").eq(patient_id))
-        return resp.get("Items", [])
+        return self._attach_document_urls(resp.get("Items", []))
 
     def update_claim_status(self, claim_id: str, status: str) -> Dict:
         """Update claim status."""
@@ -53,3 +54,21 @@ class AdminService:
             return resp.get("Attributes", {})
         except ClientError as e:
             raise RuntimeError(str(e))
+
+    def _attach_document_urls(self, items: List[Dict]) -> List[Dict]:
+        """Attach presigned view URLs for items with document_key."""
+        s3 = get_s3_client()
+        enriched: List[Dict] = []
+        for i in items:
+            key = i.get("document_key")
+            if key:
+                try:
+                    i["document_url"] = s3.generate_presigned_url(
+                        "get_object",
+                        Params={"Bucket": settings.S3_BUCKET, "Key": key},
+                        ExpiresIn=900,
+                    )
+                except Exception:
+                    pass
+            enriched.append(i)
+        return enriched

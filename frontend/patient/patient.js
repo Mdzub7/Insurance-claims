@@ -25,11 +25,13 @@ async function submitClaim(data, file) {
   });
   if (!res.ok) throw new Error("Failed to create claim");
   const result = await res.json();
-  if (file && result.s3_upload_url) {
-    const up = await fetch(result.s3_upload_url, {
-      method: "PUT",
-      headers: { "Content-Type": "application/pdf" },
-      body: file
+  if (file) {
+    const fd = new FormData();
+    fd.append("file", file, file.name);
+    const up = await fetch(`${API_BASE}/claims/${encodeURIComponent(result.claim_id)}/document`, {
+      method: "POST",
+      headers: { ...authHeader() },
+      body: fd
     });
     if (!up.ok) throw new Error("Upload failed");
   }
@@ -74,9 +76,10 @@ window.addEventListener("DOMContentLoaded", async () => {
       } else {
         let html = "<ul style='list-style:none; padding:0;'>";
         claims.forEach(c => {
+          const doc = c.document_url ? ` • <a href='${c.document_url}' target='_blank' rel='noopener'>View Document</a>` : "";
           html += `<li style='padding:10px 0; border-bottom:1px solid #eee;'>
-            <strong>${c.description}</strong> - $${c.amount}
-            <span class='badge badge-${c.claim_status}'>${c.claim_status}</span>
+            <strong>${c.description}</strong> - ₹${Number(c.amount).toFixed(2)}
+            <span class='badge badge-${c.claim_status}'>${c.claim_status}</span>${doc}
           </li>`;
         });
         html += "</ul>";
@@ -158,7 +161,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
     if (recentTable) {
       const r = claims.slice().sort((a,b)=> new Date(b.created_at)-new Date(a.created_at)).slice(0,10);
-      recentTable.innerHTML = r.map(c=>`<tr><td>${c.claim_id}</td><td>${new Date(c.created_at).toLocaleDateString()}</td><td>${c.description}</td><td>₹${Number(c.amount).toFixed(2)}</td><td><span class='badge badge-${c.claim_status}'>${c.claim_status}</span></td></tr>`).join('');
+      recentTable.innerHTML = r.map(c=>`<tr><td>${c.claim_id}</td><td>${new Date(c.created_at).toLocaleDateString()}</td><td>${c.description}</td><td>₹${Number(c.amount).toFixed(2)}</td><td><span class='badge badge-${c.claim_status}'>${c.claim_status}</span></td><td>${c.document_url?`<a href='${c.document_url}' target='_blank' rel='noopener'>View</a>`:'-'}</td></tr>`).join('');
     }
   }
 
@@ -186,8 +189,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       const qEl = document.getElementById('searchQuery');
       const q = qEl ? qEl.value.toLowerCase() : '';
       const filtered = claims.filter(c => (status==='all' || c.claim_status===status) && new Date(c.created_at).getFullYear()===year && ((c.description||'').toLowerCase().includes(q) || (c.claim_id||'').toLowerCase().includes(q)));
+      const sorted = filtered.slice().sort((a,b)=> new Date(b.created_at)-new Date(a.created_at));
       const tbody = document.getElementById('claimsTable');
-      if (tbody) tbody.innerHTML = filtered.map(c=>`<tr><td>${c.claim_id}</td><td>${new Date(c.created_at).toLocaleDateString()}</td><td>${c.description}</td><td>₹${Number(c.amount).toFixed(2)}</td><td><span class='badge badge-${c.claim_status}'>${c.claim_status}</span></td></tr>`).join('');
+      if (tbody) tbody.innerHTML = sorted.map(c=>`<tr><td>${c.claim_id}</td><td>${new Date(c.created_at).toLocaleDateString()}</td><td>${c.description}</td><td>₹${Number(c.amount).toFixed(2)}</td><td><span class='badge badge-${c.claim_status}'>${c.claim_status}</span></td><td>${c.document_url?`<a href='${c.document_url}' target='_blank' rel='noopener'>View</a>`:'-'}</td></tr>`).join('');
       const ctx = document.getElementById('historyTimeline');
       if (ctx && window.Chart) {
         const byMonth = Array(12).fill(0);
@@ -211,13 +215,14 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (lifecycleList) {
     try {
       const claims = await fetchMyClaims();
-      lifecycleList.innerHTML = claims.map(c=>{
+      lifecycleList.innerHTML = claims.slice().sort((a,b)=> new Date(b.created_at)-new Date(a.created_at)).map(c=>{
         const status = c.claim_status;
         const s1 = 'step-dot active';
         const l1 = 'step-line active';
         const s2 = status==='PENDING'||status==='APPROVED'||status==='REJECTED' ? 'step-dot active':'step-dot';
         const l2 = status==='APPROVED'||status==='REJECTED' ? 'step-line active':'step-line';
         const s3 = status==='APPROVED'||status==='REJECTED' ? 'step-dot active':'step-dot';
+        const docLink = c.document_url ? ` • <a href='${c.document_url}' target='_blank' rel='noopener'>View Document</a>` : '';
         return `
           <div class='card' style='margin-bottom:16px;'>
             <div style='display:flex; justify-content:space-between; align-items:center;'>
@@ -231,7 +236,7 @@ window.addEventListener("DOMContentLoaded", async () => {
               <div class='${l2}'></div>
               <div class='${s3}' title='Decision'></div>
             </div>
-            <div style='margin-top:8px; color:#6b7d8a;'>ID: ${c.claim_id} • ₹${Number(c.amount).toFixed(2)} • ${new Date(c.created_at).toLocaleDateString()}</div>
+            <div style='margin-top:8px; color:#6b7d8a;'>ID: ${c.claim_id} • ₹${Number(c.amount).toFixed(2)} • ${new Date(c.created_at).toLocaleDateString()}${docLink}</div>
           </div>`;
       }).join('');
     } catch { lifecycleList.textContent = 'Failed to load lifecycle'; }

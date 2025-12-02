@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
+from typing import List, Dict
 from app.schemas.claim import ClaimCreate, ClaimResponse
 from app.services.claim_service import ClaimService
 from app.core.security import get_current_user
@@ -32,3 +32,31 @@ def list_my_claims(
     current_user: dict = Depends(get_current_user)
 ):
     return service.get_claims_by_user(current_user.get("sub"))
+
+
+@router.post("/{claim_id}/document")
+def upload_document(
+    claim_id: str,
+    file: UploadFile = File(...),
+    service: ClaimService = Depends(get_claim_service),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload a PDF document for a claim to S3 and return a view URL."""
+    try:
+        # Ownership enforcement: patient can only upload to their claims would be enforced via service/repo in future
+        return service.upload_document(claim_id, file)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{claim_id}/document/confirm")
+def confirm_document(
+    claim_id: str,
+    service: ClaimService = Depends(get_claim_service),
+    current_user: dict = Depends(get_current_user)
+):
+    """Confirm document upload for a claim (compatibility endpoint)."""
+    try:
+        return service.confirm_document(claim_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

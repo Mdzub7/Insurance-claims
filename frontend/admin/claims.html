@@ -58,8 +58,9 @@
         const res = await fetch(`${API_BASE}/admin/claims/by-patient/${encodeURIComponent(patientId)}`, { headers })
         if (!res.ok) { document.getElementById('searchTable').innerHTML = '<tr><td colspan="6">Failed to load claims</td></tr>'; return }
         const claims = await res.json()
-        document.getElementById('searchTable').innerHTML = (claims.length?claims.map(c=>`
-          <tr><td>${c.claim_id}</td><td>${new Date(c.created_at).toLocaleDateString()}</td><td>${c.description||''}</td><td>₹${Number(c.amount||0).toFixed(2)}</td><td><span class='badge badge-${c.claim_status}'>${c.claim_status}</span></td><td>${c.s3_upload_url?`<a href='${c.s3_upload_url}' target='_blank'>View</a>`:'-'}</td></tr>
+        const sorted = claims.slice().sort((a,b)=> new Date(b.created_at)-new Date(a.created_at))
+        document.getElementById('searchTable').innerHTML = (sorted.length?sorted.map(c=>`
+          <tr><td>${c.claim_id}</td><td>${new Date(c.created_at).toLocaleDateString()}</td><td>${c.description||''}</td><td>₹${Number(c.amount||0).toFixed(2)}</td><td><span class='badge badge-${c.claim_status}'>${c.claim_status}</span></td><td>${c.document_url?`<a href='${c.document_url}' target='_blank' rel='noopener'>View</a>`:'-'}</td></tr>
         `).join(''):`<tr><td colspan="6">No claims found for ${patientId}</td></tr>`)
       })()
     }
