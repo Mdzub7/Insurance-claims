@@ -217,11 +217,6 @@ window.addEventListener("DOMContentLoaded", async () => {
       const claims = await fetchMyClaims();
       lifecycleList.innerHTML = claims.slice().sort((a,b)=> new Date(b.created_at)-new Date(a.created_at)).map(c=>{
         const status = c.claim_status;
-        const s1 = 'step-dot active';
-        const l1 = 'step-line active';
-        const s2 = status==='PENDING'||status==='APPROVED'||status==='REJECTED' ? 'step-dot active':'step-dot';
-        const l2 = status==='APPROVED'||status==='REJECTED' ? 'step-line active':'step-line';
-        const s3 = status==='APPROVED'||status==='REJECTED' ? 'step-dot active':'step-dot';
         const docLink = c.document_url ? ` • <a href='${c.document_url}' target='_blank' rel='noopener'>View Document</a>` : '';
         return `
           <div class='card' style='margin-bottom:16px;'>
@@ -229,12 +224,8 @@ window.addEventListener("DOMContentLoaded", async () => {
               <strong>${c.description}</strong>
               <span class='badge badge-${status}'>${status}</span>
             </div>
-            <div class='steps status-${status}' style='margin-top:12px;'>
-              <div class='${s1}' title='Submitted'></div>
-              <div class='${l1}'></div>
-              <div class='${s2}' title='In Review'></div>
-              <div class='${l2}'></div>
-              <div class='${s3}' title='Decision'></div>
+            <div class='progress-line' style='margin-top:12px;'>
+              <div class='progress-fill status-${status}'></div>
             </div>
             <div style='margin-top:8px; color:#6b7d8a;'>ID: ${c.claim_id} • ₹${Number(c.amount).toFixed(2)} • ${new Date(c.created_at).toLocaleDateString()}${docLink}</div>
           </div>`;

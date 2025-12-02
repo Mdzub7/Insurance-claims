@@ -76,18 +76,22 @@
       const years=Array.from(new Set(allClaims.map(c=> new Date(c.created_at).getFullYear()))).sort(); const currentYear=new Date().getFullYear(); yearSelect.innerHTML=years.map(y=>`<option ${y===currentYear?'selected':''}>${y}</option>`).join('');
       function render(){
         const year=parseInt(yearSelect.value||currentYear); const uid=userSelect.value;
-        const claims=allClaims.filter(c=> { const d=new Date(c.created_at); return !isNaN(d) && d.getFullYear()===year && (uid==='all' || c.user_id===uid); });
+        // Charts: filter by Year + selected User
+        const chartClaims=allClaims.filter(c=> { const d=new Date(c.created_at); return !isNaN(d) && d.getFullYear()===year && (uid==='all' || c.user_id===uid); });
         const byMonth=Array(12).fill(0), amtByMonth=Array(12).fill(0);
-        let p=0,a=0,rj=0; const totalsByUser={};
-        claims.forEach(c=>{ const d=new Date(c.created_at); const m=d.getMonth(); byMonth[m]++; amtByMonth[m]+=Number(c.amount||0); const st=(c.claim_status||''); if(st==='PENDING')p++; else if(st==='APPROVED')a++; else if(st==='REJECTED')rj++; totalsByUser[c.user_id]=(totalsByUser[c.user_id]||0)+Number(c.amount||0); });
+        let p=0,a=0,rj=0;
+        chartClaims.forEach(c=>{ const d=new Date(c.created_at); const m=d.getMonth(); byMonth[m]++; amtByMonth[m]+=Number(c.amount||0); const st=(c.claim_status||''); if(st==='PENDING')p++; else if(st==='APPROVED')a++; else if(st==='REJECTED')rj++; });
         const mctx=document.getElementById('chartMonthlyAll'); if (mctx) new Chart(mctx,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{label:'Claims',data:byMonth,backgroundColor:'#0926fe',borderRadius:6},{label:'Amount (₹)',data:amtByMonth,type:'line',borderColor:'#27ae60',yAxisID:'y1'}]},options:{responsive:true,scales:{y:{beginAtZero:true},y1:{beginAtZero:true,position:'right'}}}});
         const sctx=document.getElementById('chartStatusAll'); if (sctx) new Chart(sctx,{type:'doughnut',data:{labels:['Pending','Approved','Rejected'],datasets:[{data:[p,a,rj],backgroundColor:['#f1c40f','#27ae60','#e74c3c']}]} });
-        const filteredUsers = uid==='all' ? users.filter(u=> claims.some(c=> c.user_id===u.user_id)) : users.filter(u=> u.user_id===uid);
+        // Top Users: filter by Year only (ignore selected User)
+        const yearClaims=allClaims.filter(c=> { const d=new Date(c.created_at); return !isNaN(d) && d.getFullYear()===year; });
+        const totalsByUser={}; yearClaims.forEach(c=>{ totalsByUser[c.user_id]=(totalsByUser[c.user_id]||0)+Number(c.amount||0); });
         const topPairs=Object.entries(totalsByUser).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([uid,amt])=>{ const u=users.find(x=>x.user_id===uid); const label=(u && (u.name||u.email))||uid; return [label, amt]; });
         const tctx=document.getElementById('chartTopUsers'); if (tctx) new Chart(tctx,{type:'bar',data:{labels:topPairs.map(p=>p[0]),datasets:[{label:'Total Amount (₹)',data:topPairs.map(p=>p[1]),backgroundColor:'#00a6a6',borderRadius:6}]},options:{responsive:true,indexAxis:'y'} });
-        // Apply filters to the User Search table
+        // User Search table: filter by Year only (ignore selected User)
+        const allowedUserIds = new Set(yearClaims.map(c=> c.user_id));
         const tbody=document.getElementById('searchResults');
-        if (tbody) tbody.innerHTML=filteredUsers.map(u=>`<tr><td>${u.name||''}</td><td>${u.email||''}</td><td>${u.role||''}</td><td>${u.patient_id||''}</td></tr>`).join('');
+        if (tbody) tbody.innerHTML=users.filter(u=> allowedUserIds.has(u.user_id)).map(u=>`<tr><td>${u.name||''}</td><td>${u.email||''}</td><td>${u.role||''}</td><td>${u.patient_id||''}</td></tr>`).join('');
       }
       render();
       yearSelect.addEventListener('change', render); userSelect.addEventListener('change', render);

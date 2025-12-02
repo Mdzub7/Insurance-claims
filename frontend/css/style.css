@@ -276,21 +276,19 @@ button:hover { background-color: #0926fe; }
 .charts-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-5); }
 .table-card { background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow-md); }
 .table-card table { width: 100%; border-collapse: collapse; }
-.table-card th, .table-card td { padding: 12px 16px; border-bottom: 1px solid #eef1f5; text-align: left; }
-.table-card thead th { background: #f4f6f8; font-weight: var(--font-weight-bold); }
+.table-card thead th { background: #f4f6f8; font-weight: var(--font-weight-bold); border: 1px solid #e1e7ef; }
+.table-card th, .table-card td { padding: 12px 16px; border: 1px solid #e1e7ef; text-align: left; }
+.table-card tbody tr:nth-child(even) { background: #fbfdff; }
+.table-card tbody tr:hover { background: #f3f7ff; }
 .filters { display: flex; gap: var(--space-3); align-items: center; margin-bottom: var(--space-3); }
 #yearSelect, #yearFilter { width: 140px; }
 
-/* Lifecycle stepper */
-.steps { display:flex; align-items:center; gap:12px; }
-.step-dot { width:12px; height:12px; border-radius:50%; background:#c7d7e6; }
-.step-dot.active { background:#0926fe; }
-.step-line { flex:1; height:2px; background:#c7d7e6; }
-.step-line.active { background:#0926fe; }
-
-.steps.status-APPROVED .step-dot.active, .steps.status-APPROVED .step-line.active { background:#27ae60; }
-.steps.status-REJECTED .step-dot.active, .steps.status-REJECTED .step-line.active { background:#e74c3c; }
-.steps.status-PENDING .step-dot.active, .steps.status-PENDING .step-line.active { background:#f1c40f; }
+/* Lifecycle single progress bar */
+.progress-line { width: 100%; height: 8px; background: #e6eef7; border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; width: 100%; background: #27ae60; transition: background-color .25s ease; }
+.progress-fill.status-PENDING { background: #f1c40f; }
+.progress-fill.status-REJECTED { background: #e74c3c; }
+.progress-fill.status-APPROVED { background: #27ae60; }
 
 @media (max-width: 1024px) {
   .patient-shell { grid-template-columns: 220px 1fr; }
