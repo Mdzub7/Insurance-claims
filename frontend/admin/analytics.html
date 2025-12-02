@@ -74,6 +74,8 @@
       let allClaims = claimsRes.ok ? await claimsRes.json() : [];
       if (!allClaims.length) { const now=new Date(); allClaims=[{created_at:now.toISOString(), amount:1200, claim_status:'PENDING', user_id:'demo'}]; }
       const years=Array.from(new Set(allClaims.map(c=> new Date(c.created_at).getFullYear()))).sort(); const currentYear=new Date().getFullYear(); yearSelect.innerHTML=years.map(y=>`<option ${y===currentYear?'selected':''}>${y}</option>`).join('');
+      let chartMonthlyInst = null;
+      let chartStatusInst = null;
       function render(){
         const year=parseInt(yearSelect.value||currentYear); const uid=userSelect.value;
         // Charts: filter by Year + selected User
@@ -81,8 +83,25 @@
         const byMonth=Array(12).fill(0), amtByMonth=Array(12).fill(0);
         let p=0,a=0,rj=0;
         chartClaims.forEach(c=>{ const d=new Date(c.created_at); const m=d.getMonth(); byMonth[m]++; amtByMonth[m]+=Number(c.amount||0); const st=(c.claim_status||''); if(st==='PENDING')p++; else if(st==='APPROVED')a++; else if(st==='REJECTED')rj++; });
-        const mctx=document.getElementById('chartMonthlyAll'); if (mctx) new Chart(mctx,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{label:'Claims',data:byMonth,backgroundColor:'#0926fe',borderRadius:6},{label:'Amount (₹)',data:amtByMonth,type:'line',borderColor:'#27ae60',yAxisID:'y1'}]},options:{responsive:true,scales:{y:{beginAtZero:true},y1:{beginAtZero:true,position:'right'}}}});
-        const sctx=document.getElementById('chartStatusAll'); if (sctx) new Chart(sctx,{type:'doughnut',data:{labels:['Pending','Approved','Rejected'],datasets:[{data:[p,a,rj],backgroundColor:['#f1c40f','#27ae60','#e74c3c']}]} });
+        const mctx=document.getElementById('chartMonthlyAll');
+        if (mctx) {
+          if (!chartMonthlyInst) {
+            chartMonthlyInst = new Chart(mctx,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{label:'Claims',data:byMonth,backgroundColor:'#0926fe',borderRadius:6},{label:'Amount (₹)',data:amtByMonth,type:'line',borderColor:'#27ae60',yAxisID:'y1'}]},options:{responsive:true,scales:{y:{beginAtZero:true},y1:{beginAtZero:true,position:'right'}}}});
+          } else {
+            chartMonthlyInst.data.datasets[0].data = byMonth;
+            chartMonthlyInst.data.datasets[1].data = amtByMonth;
+            chartMonthlyInst.update();
+          }
+        }
+        const sctx=document.getElementById('chartStatusAll');
+        if (sctx) {
+          if (!chartStatusInst) {
+            chartStatusInst = new Chart(sctx,{type:'doughnut',data:{labels:['Pending','Approved','Rejected'],datasets:[{data:[p,a,rj],backgroundColor:['#f1c40f','#27ae60','#e74c3c']}]} });
+          } else {
+            chartStatusInst.data.datasets[0].data = [p,a,rj];
+            chartStatusInst.update();
+          }
+        }
         // Top Users: filter by Year only (ignore selected User)
         const yearClaims=allClaims.filter(c=> { const d=new Date(c.created_at); return !isNaN(d) && d.getFullYear()===year; });
         const totalsByUser={}; yearClaims.forEach(c=>{ totalsByUser[c.user_id]=(totalsByUser[c.user_id]||0)+Number(c.amount||0); });
