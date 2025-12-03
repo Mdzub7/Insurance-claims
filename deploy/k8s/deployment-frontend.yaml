@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insurance-claims-app
+  namespace: training
+  labels:
+    app: insurance-claims
+spec:
+  # replicas: 2
+  selector:
+    matchLabels:
+      app: insurance-claims
+  template:
+    metadata:
+      labels:
+        app: insurance-claims
+    spec:
+      containers:
+      - name: app
+        image: 305951556280.dkr.ecr.eu-west-2.amazonaws.com/intl-training-prarambh/intl-euro-testing:frontend-v2
+        resources:
+          requests:
+            cpu: "2"
+            memory: "250Mi"
+          limits:
+            cpu: "4"
+            memory: "500Mi"
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: insurance-claims-app
+  namespace: training
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https
+spec:
+  type: LoadBalancer
+  selector:
+    app: insurance-claims
+  ports:
+    - port: 80
+      targetPort: 8000

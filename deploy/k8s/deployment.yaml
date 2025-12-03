@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capstone-team-2-app
+  namespace: training
+  labels:
+    app: capstone-team-2
+spec:
+  # replicas: 2
+  selector:
+    matchLabels:
+      app: capstone-team-2
+  template:
+    metadata:
+      labels:
+        app: capstone-team-2
+    spec:
+      containers:
+      - name: fastapi
+        image: 305951556280.dkr.ecr.eu-west-2.amazonaws.com/intl-training-prarambh/intl-euro-testing:backend-v1
+        resources:
+          requests:
+            cpu: "2"
+            memory: "250Mi"
+          limits:
+            cpu: "4"
+            memory: "500Mi"
+        ports:
+        - containerPort: 8001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: capstone-team2-backend-app
+  namespace: training
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https
+spec:
+  type: LoadBalancer
+  selector:
+    app: capstone-team-2
+  ports:
+    - port: 80
+      targetPort: 8001
