@@ -33,6 +33,11 @@ Static HTML/CSS/JS app served via any static server. Uses Poppins/Inter fonts, C
 - Start a static server in `frontend`: `python3 -m http.server 8080`
 - Update Playwright tests (optional): `npm i -D @playwright/test && npx playwright test`
 
+## Containerization & EKS
+- Build image: `docker build -t claims-frontend:latest .`
+- Configure backend base via env: `BACKEND_BASE=http://claims-backend.default.svc.cluster.local:8001`
+- Deploy to EKS with two replicas and a LoadBalancer service; set `BACKEND_BASE` in the Deployment env.
+
 ## Accessibility
 - Semantic landmarks (`header`, `nav`, `aside`, `main`), focus states and high-contrast colors. Charts include readable labels.
 

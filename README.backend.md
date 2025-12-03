@@ -32,6 +32,10 @@ FastAPI service with AWS integrations (DynamoDB, Secrets Manager). Provides auth
 - Run FastAPI (example): `uvicorn app.main:app --reload --port 8001`
 - Ensure AWS credentials are configured (`aws configure`).
 
+## CI
+- GitHub Actions runs backend tests on push/PR via `.github/workflows/ci.yml`.
+- Configure `AWS_REGION`, `AWS_OIDC_ROLE` for Terraform and ECR workflows.
+
 ## Tests
 - `backend/tests` — basic tests for auth/claims.
 - Run: `python -m pytest` or `python run_tests.py`.

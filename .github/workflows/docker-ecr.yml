@@ -1,0 +1,42 @@
+name: Build and Push Docker to ECR
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_BACKEND: ${{ secrets.ECR_BACKEND }}
+  ECR_FRONTEND: ${{ secrets.ECR_FRONTEND }}
+
+jobs:
+  push-images:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE }}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build backend
+        run: |
+          docker build -t $ECR_BACKEND:${{ github.sha }} -f backend/Dockerfile backend
+          docker tag $ECR_BACKEND:${{ github.sha }} $ECR_BACKEND:latest
+      - name: Build frontend
+        run: |
+          docker build -t $ECR_FRONTEND:${{ github.sha }} -f frontend/Dockerfile frontend
+          docker tag $ECR_FRONTEND:${{ github.sha }} $ECR_FRONTEND:latest
+      - name: Push backend
+        run: |
+          docker push $ECR_BACKEND:${{ github.sha }}
+          docker push $ECR_BACKEND:latest
+      - name: Push frontend
+        run: |
+          docker push $ECR_FRONTEND:${{ github.sha }}
+          docker push $ECR_FRONTEND:latest
+

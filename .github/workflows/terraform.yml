@@ -1,0 +1,39 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'terraform/**'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE }}
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false
+      - name: Terraform Validate
+        working-directory: terraform
+        run: terraform validate
+      - name: Terraform Plan
+        working-directory: terraform
+        run: terraform plan -input=false
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: terraform
+        run: terraform apply -input=false -auto-approve
+
