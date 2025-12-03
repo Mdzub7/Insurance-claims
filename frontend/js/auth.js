@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8001/api/v1";
+const API_BASE = "http://k8s-training-capstone-e0f294e241-9c8360a7cd58c010.elb.eu-west-2.amazonaws.com/api/v1";
 
 function setAuth(token, role, patientId, remember) {
   const storage = remember ? localStorage : sessionStorage;

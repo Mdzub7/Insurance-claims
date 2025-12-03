@@ -7,7 +7,6 @@ from app.core.config import settings
 from app.schemas.claim import ClaimCreate, ClaimResponse
 from typing import Dict, List, Optional, Tuple
 from botocore.client import BaseClient
-from boto3.resources.factory import DynamoDBServiceResource
 from fastapi import UploadFile
 
 class ClaimService:

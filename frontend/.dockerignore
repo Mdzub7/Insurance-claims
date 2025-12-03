@@ -1,0 +1,56 @@
+# =============================================================================
+# Docker Ignore - Insurance Claims Portal Frontend
+# Excludes files not needed in the container image
+# =============================================================================
+
+# Node modules and package files (only used for testing)
+node_modules/
+package.json
+package-lock.json
+
+# Testing files
+playwright.config.ts
+*.spec.ts
+*.spec.js
+*.test.ts
+*.test.js
+tests/
+test/
+__tests__/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation
+README.md
+CHANGELOG.md
+LICENSE
+*.md
+
+# Docker files (don't need to copy themselves)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
