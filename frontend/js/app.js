@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8001/api/v1/claims"; // Ensure this matches your running Backend IP/Port
+const API_URL = "http://k8s-training-capstone-e0f294e241-9c8360a7cd58c010.elb.eu-west-2.amazonaws.com/api/v1/claims"; // Ensure this matches your running Backend IP/Port
 
 // 1. Handle Form Submission
 document.getElementById('claimForm').addEventListener('submit', async (e) => {
