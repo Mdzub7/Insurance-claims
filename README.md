@@ -72,13 +72,6 @@ Modern claims portal with patient and admin experiences. Frontend is static (HTM
   - Patient submits a claim with PDF; document view link appears.
   - Admin dashboard shows pending; approve/reject; analytics update.
 
-## Viva Prep
-- GitHub Actions: purpose, triggers, OIDC to AWS, artifacts vs deploy.
-- Terraform: state, plan/apply, single table DynamoDB design.
-- FastAPI: dependency injection, pydantic schemas, async endpoints.
-- AWS: Secrets Manager (JWT), DynamoDB (GSI), S3 presigned URLs, Lambda→SQS.
-- Containers: image layering, ECR registry, EKS services.
-
 ## Notes
 - Lambda, Bedrock.
 - For full admin analytics across all statuses, add an endpoint to list claims or query by status; current UI uses available endpoints (pending + users) and polls for real-time updates.
